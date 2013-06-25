@@ -23,9 +23,9 @@ minetest.register_tool("3d_armor:helmet_bronze", {
 	wear = 0,
 })
 
-minetest.register_tool("3d_armor:helmet_diamond", {
-	description = "Diamond Helmet",
-	inventory_image = "3d_armor_inv_helmet_diamond.png",
+minetest.register_tool("3d_armor:helmet_mithril", {
+	description = "Mithril Helmet",
+	inventory_image = "3d_armor_inv_helmet_mithril.png",
 	groups = {armor_head=15, armor_heal=12, armor_use=100},
 	wear = 0,
 })
@@ -54,9 +54,9 @@ minetest.register_tool("3d_armor:chestplate_bronze", {
 	wear = 0,
 })
 
-minetest.register_tool("3d_armor:chestplate_diamond", {
-	description = "Diamond Chestplate",
-	inventory_image = "3d_armor_inv_chestplate_diamond.png",
+minetest.register_tool("3d_armor:chestplate_mithril", {
+	description = "Mithril Chestplate",
+	inventory_image = "3d_armor_inv_chestplate_mithril.png",
 	groups = {armor_torso=20, armor_heal=12, armor_use=100},
 	wear = 0,
 })
@@ -85,9 +85,9 @@ minetest.register_tool("3d_armor:leggings_bronze", {
 	wear = 0,
 })
 
-minetest.register_tool("3d_armor:leggings_diamond", {
-	description = "Diamond Leggings",
-	inventory_image = "3d_armor_inv_leggings_diamond.png",
+minetest.register_tool("3d_armor:leggings_mithril", {
+	description = "Mithril Leggings",
+	inventory_image = "3d_armor_inv_leggings_mithril.png",
 	groups = {armor_legs=20, armor_heal=12, armor_use=100},
 	wear = 0,
 })
@@ -115,9 +115,9 @@ minetest.register_tool("3d_armor:boots_bronze", {
 	wear = 0,
 })
 
-minetest.register_tool("3d_armor:boots_diamond", {
-	description = "Diamond Boots",
-	inventory_image = "3d_armor_inv_boots_diamond.png",
+minetest.register_tool("3d_armor:boots_mithril", {
+	description = "Mithril Boots",
+	inventory_image = "3d_armor_inv_boots_mithril.png",
 	groups = {armor_feet=15, armor_heal=12, armor_use=100},
 	wear = 0,
 })
@@ -128,7 +128,7 @@ local craft_ingreds = {
 	wood = "default:wood",
 	steel = "default:steel_ingot",
 	bronze = "default:bronze_ingot",
-	diamond = "default:diamond",
+	diamond = "dwarves:mithril_ingot",
 }	
 
 for k, v in pairs(craft_ingreds) do

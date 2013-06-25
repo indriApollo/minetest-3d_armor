@@ -21,9 +21,9 @@ minetest.register_tool("shields:shield_bronze", {
 	wear = 0,
 })
 
-minetest.register_tool("shields:shield_diamond", {
-	description = "Diamond Shield",
-	inventory_image = "shields_inv_shield_diamond.png",
+minetest.register_tool("shields:shield_mithril", {
+	description = "Mithril Shield",
+	inventory_image = "shields_inv_shield_mithril.png",
 	groups = {armor_shield=15, armor_heal=12, armor_use=100},
 	wear = 0,
 })
@@ -33,7 +33,7 @@ local craft_ingreds = {
 	wood = "default:wood",
 	steel = "default:steel_ingot",
 	bronze = "default:bronze_ingot",
-	diamond = "default:diamond",
+	diamond = "dwarves:mithril_ingot",
 }	
 
 for k, v in pairs(craft_ingreds) do
