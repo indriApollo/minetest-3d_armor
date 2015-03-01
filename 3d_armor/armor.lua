@@ -1,3 +1,5 @@
+-- Global Defaults - use armor.conf to override these
+
 ARMOR_INIT_DELAY = 1
 ARMOR_INIT_TIMES = 1
 ARMOR_BONES_DELAY = 1
@@ -16,8 +18,7 @@ ARMOR_MATERIALS = {
 	mithril = "moreores:mithril_ingot",
 }
 
-local skin_mod = nil
-local inv_mod = nil
+-- Load Armor Configs
 
 local modpath = minetest.get_modpath(ARMOR_MOD_NAME)
 local worldpath = minetest.get_worldpath()
@@ -37,7 +38,9 @@ if not minetest.get_modpath("moreores") then
 	ARMOR_MATERIALS.mithril = nil
 end
 
+-- Armor API
 
+local inv_mod = nil
 local time = 0
 
 armor = {
@@ -50,7 +53,7 @@ armor = {
 		.."list[current_player;craft;4,1;3,3;]"
 		.."list[current_player;craftpreview;7,2;1,1;]",
 	textures = {},
-	default_skin = "character",
+	def = {state=0, count = 0},
 	version = "0.4.3",
 }
 
@@ -82,25 +85,6 @@ elseif minetest.get_modpath("unified_inventory") then
 	})
 end
 
-armor.def = {
-	state = 0,
-	count = 0,
-}
-
-armor.update_player_visuals = function(self, player)
-	if not player then
-		return
-	end
-	local name = player:get_player_name()
-	if self.textures[name] then
-		default.player_set_textures(player, {
-			self.textures[name].skin,
-			self.textures[name].armor,
-			self.textures[name].wielditem,
-		})
-	end
-end
-
 armor.set_player_armor = function(self, player)
 	if not player then
 		return
@@ -124,7 +108,8 @@ armor.set_player_armor = function(self, player)
 	local textures = {}
 	local physics_o = {speed=1,gravity=1,jump=1}
 	local material = {type=nil, count=1}
-	local preview = armor:get_player_skin(name).."_preview.png"
+	local preview = multiskin:get_skin_name(name) or "3d_armor_preview"
+	preview = preview..".png"
 	for _,v in ipairs(self.elements) do
 		elements[v] = false
 	end
@@ -192,7 +177,8 @@ armor.set_player_armor = function(self, player)
 	self.def[name].jump = physics_o.jump
 	self.def[name].speed = physics_o.speed
 	self.def[name].gravity = physics_o.gravity
-	self:update_player_visuals(player)
+	multiskin[name].armor = armor_texture
+	multiskin:update_player_visuals(player)
 end
 
 armor.update_armor = function(self, player)
@@ -202,7 +188,7 @@ armor.update_armor = function(self, player)
 	end
 	local name = player:get_player_name()
 	if not name then
-		minetest.log("error", "3d_armor: Player name is nil[update_armor]")
+		minetest.log("error", "3d_armor: Player name is nil [update_armor]")
 		return
 	end
 	local hp = player:get_hp() or 0
@@ -255,16 +241,6 @@ armor.update_armor = function(self, player)
 	self.player_hp[name] = hp
 end
 
-armor.get_player_skin = function(self, name)
-	local skin = nil
-	if skin_mod == "skins" then
-		skin = skins.skins[name]
-	elseif skin_mod == "u_skins" then
-		skin = u_skins.u_skins[name]
-	end
-	return skin or armor.default_skin
-end
-
 armor.get_armor_formspec = function(self, name)
 	if not name then
 		minetest.log("error", "3d_armor: Player name is nil [get_armor_formspec]")
@@ -311,25 +287,6 @@ armor.update_inventory = function(self, player)
 	end
 end
 
--- Register Player Model
-
-default.player_register_model("3d_armor_character.b3d", {
-	animation_speed = 30,
-	textures = {
-		armor.default_skin..".png",
-		"3d_armor_trans.png",
-		"3d_armor_trans.png",
-	},
-	animations = {
-		stand = {x=0, y=79},
-		lay = {x=162, y=166},
-		walk = {x=168, y=187},
-		mine = {x=189, y=198},
-		walk_mine = {x=200, y=219},
-		sit = {x=81, y=160},
-	},
-})
-
 -- Register Callbacks
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
@@ -339,19 +296,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		inventory_plus.set_inventory_formspec(player, formspec)
 		return
 	end
-	for field, _ in pairs(fields) do
-		if string.find(field, "skins_set") then
-			minetest.after(0, function(player)
-				local skin = armor:get_player_skin(name)
-				armor.textures[name].skin = skin..".png"
-				armor:set_player_armor(player)
-			end, player)
-		end
-	end
 end)
 
 minetest.register_on_joinplayer(function(player)
-	default.player_set_model(player, "3d_armor_character.b3d")
+	multiskin:init(player)
 	local name = player:get_player_name()
 	local player_inv = player:get_inventory()
 	local armor_inv = minetest.create_detached_inventory(name.."_armor",{
@@ -391,15 +339,7 @@ minetest.register_on_joinplayer(function(player)
 	for i=1, 6 do
 		local stack = player_inv:get_stack("armor", i)
 		armor_inv:set_stack("armor", i, stack)
-	end	
-
-	-- Legacy support, import player's armor from old inventory format
-	for _,v in pairs(armor.elements) do
-		local list = "armor_"..v
-		armor_inv:add_item("armor", player_inv:get_stack(list, 1))
-		player_inv:set_stack(list, 1, nil)
 	end
-	-- TODO Remove this on the next version upate
 
 	armor.player_hp[name] = 0
 	armor.def[name] = {
@@ -412,38 +352,9 @@ minetest.register_on_joinplayer(function(player)
 		gravity = 1,
 	}
 	armor.textures[name] = {
-		skin = armor.default_skin..".png",
 		armor = "3d_armor_trans.png",
-		wielditem = "3d_armor_trans.png",
-		preview = armor.default_skin.."_preview.png",
+		preview = "3d_armor_preview.png"
 	}
-	if minetest.get_modpath("skins") then
-		skin_mod = "skins"
-		local skin = skins.skins[name]
-		if skin and skins.get_type(skin) == skins.type.MODEL then
-			armor.textures[name].skin = skin..".png"
-		end
-	elseif minetest.get_modpath("simple_skins") then
-		skin_mod = "skins"
-		local skin = skins.skins[name]
-		if skin then
-		    armor.textures[name].skin = skin..".png"
-		end
-	elseif minetest.get_modpath("u_skins") then
-		skin_mod = "u_skins"
-		local skin = u_skins.u_skins[name]
-		if skin and u_skins.get_type(skin) == u_skins.type.MODEL then
-			armor.textures[name].skin = skin..".png"
-		end
-	end
-	if minetest.get_modpath("player_textures") then
-		local filename = minetest.get_modpath("player_textures").."/textures/player_"..name
-		local f = io.open(filename..".png")
-		if f then
-			f:close()
-			armor.textures[name].skin = "player_"..name..".png"
-		end
-	end
 	for i=1, ARMOR_INIT_TIMES do
 		minetest.after(ARMOR_INIT_DELAY * i, function(player)
 			armor:set_player_armor(player)
