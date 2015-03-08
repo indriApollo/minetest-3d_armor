@@ -21,7 +21,7 @@ function multiskin:init(player)
 			multiskin[name].skin = skin..".png"
 		end
 	elseif minetest.get_modpath("simple_skins") then
-		skin_mod = "skins"
+		skin_mod = "simple_skins"
 		local skin = skins.skins[name]
 		if skin then
 		    multiskin[name].skin = skin..".png"
@@ -59,13 +59,19 @@ function multiskin:update_player_visuals(player)
 end
 
 function multiskin:get_skin_name(name)
-	local skin = nil
-	if skin_mod == "skins" then
-		skin = skins.skins[name] or MULTISKIN_DEFAULT_SKIN
+	skin = nil
+	if skin_mod == "skins" or skin_mod == "simple_skins" then
+		skin = skins.skins[name] 
 	elseif skin_mod == "u_skins" then
-		skin = u_skins.u_skins[name] or MULTISKIN_DEFAULT_SKIN
+		skin = u_skins.u_skins[name]
 	end
-	return skin
+	return skin or MULTISKIN_DEFAULT_SKIN
+end
+
+function multiskin:get_preview(name)
+	if skin_mod == "skins" or skin_mod == "u_skins" then
+		return multiskin:get_skin_name(name).."_preview.png"
+	end
 end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)

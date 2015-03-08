@@ -11,9 +11,11 @@ Common multi-layer player texturing api used by the modpack.
 Compatible with the following skin changing mods:
 
 	[player_textures] by PilzAdam
-	[simple_skins] by TenPlus1
+	*[simple_skins] by TenPlus1
 	[skins] by Zeg9
 	[u_skins] by SmallJoker
+
+* requires patch https://gist.github.com/stujones11/8a8669d12b2d2c69400c
 
 [mod] Visible Player Armor [3d_armor]
 -------------------------------------

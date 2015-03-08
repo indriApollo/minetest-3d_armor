@@ -108,8 +108,7 @@ armor.set_player_armor = function(self, player)
 	local textures = {}
 	local physics_o = {speed=1,gravity=1,jump=1}
 	local material = {type=nil, count=1}
-	local preview = multiskin:get_skin_name(name) or "3d_armor_preview"
-	preview = preview..".png"
+	local preview = multiskin:get_preview(name) or "3d_armor_preview.png"
 	for _,v in ipairs(self.elements) do
 		elements[v] = false
 	end
