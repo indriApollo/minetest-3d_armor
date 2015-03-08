@@ -4,6 +4,13 @@ MULTISKIN_TRANS = "multiskin_trans.png"
 multiskin = {}
 
 local skin_mod = nil
+if minetest.get_modpath("skins") then
+	skin_mod = "skins"
+elseif minetest.get_modpath("simple_skins") then
+	skin_mod = "simple_skins"
+elseif minetest.get_modpath("u_skins") then
+	skin_mod = "u_skins"
+end
 
 function multiskin:init(player)
 	default.player_set_model(player, "multiskin.b3d")
@@ -14,20 +21,17 @@ function multiskin:init(player)
 		wielditem = MULTISKIN_TRANS,
 		clothing = MULTISKIN_TRANS,
 	}
-	if minetest.get_modpath("skins") then
-		skin_mod = "skins"
+	if skin_mod == "skins" then
 		local skin = skins.skins[name]
 		if skin and skins.get_type(skin) == skins.type.MODEL then
 			multiskin[name].skin = skin..".png"
 		end
-	elseif minetest.get_modpath("simple_skins") then
-		skin_mod = "simple_skins"
+	elseif skin_mod == "simple_skins" then
 		local skin = skins.skins[name]
 		if skin then
 		    multiskin[name].skin = skin..".png"
 		end
-	elseif minetest.get_modpath("u_skins") then
-		skin_mod = "u_skins"
+	elseif skin_mod == "u_skins" then
 		local skin = u_skins.u_skins[name]
 		if skin and u_skins.get_type(skin) == u_skins.type.MODEL then
 			multiskin[name].skin = skin..".png"
@@ -69,7 +73,7 @@ function multiskin:get_skin_name(name)
 end
 
 function multiskin:get_preview(name)
-	if skin_mod == "skins" or skin_mod == "u_skins" then
+	if skin_mod == "u_skins" then
 		return multiskin:get_skin_name(name).."_preview.png"
 	end
 end
