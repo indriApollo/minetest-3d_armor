@@ -81,7 +81,7 @@ end
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local name = player:get_player_name()
 	for field, _ in pairs(fields) do
-		if string.find(field, "skins_set_") then
+		if string.find(field, "skins_set") then
 			minetest.after(0, function(player)
 				local skin = multiskin:get_skin_name(name)
 				if skin then
